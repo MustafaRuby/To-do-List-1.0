@@ -14,11 +14,31 @@ body{
     clear: both;
 }
 
-.title{
+.title-block {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    width: fit-content;
+    margin: auto;
+}
+
+.title {
     font-size: 60px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: antiquewhite;
 }
+
+.information{
+    padding: 5px;
+    padding-left: 11px;
+    padding-right: 11px;
+    border-radius: 1000px;
+    font-weight: bolder;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: cyan;
+    cursor: pointer;
+}
+
 
 .input-label{
     font-size: 40px;
