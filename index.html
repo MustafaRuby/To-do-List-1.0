@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+    <title>To Do List</title>
+    <link rel="shortcut icon" href="https://imgs.search.brave.com/96dA67hAa9wTH90wzpfqy_lWbMjMf-lmSgjzaw9_Wu4/rs:fit:860:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMtMDAuaWNvbmR1/Y2suY29tL2Fzc2V0/cy4wMC9maWxlLXRl/eHQtaWNvbi0xMDI0/eDEwMjItdnhqN2Nt/aDYucG5n" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+
+    <div class="general-block">
+        <h1 class="title">Your own to-do-list</h1>
+
+        <div class="input-details">
+            <input type="text" class="input-box" id="input-box" placeholder="Details about your event">
+        
+            <input type="date" class="input-box" id="date-box" name="date" placeholder="dd-mm-yyyy"><br><br>
+        </div>
+
+        <div class="buttons">
+            <button class="list-button" id="insert-button">Add event</button>
+
+            <button class="list-button" id="remove-checked">Remove selected events</button>
+
+            <button class="list-button" id="eliminate-all">Clear the list</button>
+        </div>
+
+        <p class="list-title">To-Do-list</p>
+
+        <div id="to-do-list" class="to-do-list">
+        </div>
+
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
+
+
+
