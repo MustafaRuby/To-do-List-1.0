@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+    <title>To Do List</title>
+    <link rel="shortcut icon" href="https://imgs.search.brave.com/96dA67hAa9wTH90wzpfqy_lWbMjMf-lmSgjzaw9_Wu4/rs:fit:860:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMtMDAuaWNvbmR1/Y2suY29tL2Fzc2V0/cy4wMC9maWxlLXRl/eHQtaWNvbi0xMDI0/eDEwMjItdnhqN2Nt/aDYucG5n" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+
+    <div class="general-block">
+        <div class="title-block">
+            <a href="index.html"><button class="information">L</button></a>
+            <a href="inputBackUp.html"><button class="information">B</button></a>
+            <h1 class="title">Use info</h1>
+        </div>
+
+        <div class="information-box">
+            <p class="information-text">Hi! This is your own to do list app, here's how you can use it:<br><br>
+                Event insertion: <br> To insert you write the details about the event you want to plan (if you don't insert any details, you will not be able to insert any event), then you can add a date to your plan, if you don't, it'll automatically set the date to the day you inserted it on. 
+                <br><br> To add an event to the list, you can click the "Add event" button, or click "Enter" while in the input or date feild. 
+                <br><br> List use: <br> To check events that you already completed, either click on the checkbox or the event itself. 
+                <br><br> To eliminate the events you checked you can either click the "Remove checked events" buttons or simply press the "Backspace" or "delete" key. 
+                <br><br> To check all the elements simply press "Ctrl+A".
+                <br><br> To select an event, click anywhere on the event other than the details of the event, the date, the time, and the checkbox. 
+                <br><br> To clear the list click the "Clear list" button.
+                <br><br> To backup, you can go to the backup page with the "B" button on the top of the page, you can go back to the list page with the "L" button beside it.
+                <br><br> The backup page has two functionalities:
+                <br>- Generate Backup: generates a json string, that can be inputted into the app to recover the current events in the app;
+                <br>- Backup; Uses whatever input in the backup input feild, and repositions the backed up events.
+                <br><br> To modify an event, you can double click any part of the event (detils, date or time) and it'll allow you to modify, esc doesn't save changes.
+            </p>
+        </div>
+
+    </div>
+
+    <script src="information.js"></script>
+</body>
+</html>

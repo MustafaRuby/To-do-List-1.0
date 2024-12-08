@@ -1,26 +1,184 @@
 let list = document.getElementById("to-do-list");
 
-document.addEventListener("keydown", function(event){
-    if(event.key === "Backspace" || event.key === "Delete"){
-        document.getElementById("remove-checked").click();
-    }
-    if(event.ctrlKey && event.key === "a"){
-        event.preventDefault();
-        var checkboxes = document.querySelectorAll(".checkbox-eliminate");
-        
-        var allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+function createEvent(inputText, dateInput, timeInput, isChecked = false) {
+    let event = document.createElement("div");
+    event.className = "event";
+    event.id = "event";
 
-        if(allChecked){
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = false;
-                checkbox.parentNode.parentNode.style.border = "5px solid black";
-            });
+    event.innerHTML = `
+        <div class="check">
+            <input type="checkbox" class="checkbox-eliminate" ${isChecked ? 'checked' : ''}>
+        </div>
+        <button class="trash-button"><i class="fa fa-trash"></i></button>
+        <div class="details">
+            ${inputText}
+        </div>
+        <div class="day">
+            ${dateInput}
+        </div>
+        <div class="time">
+            ${timeInput}
+        </div>
+    `;
+
+    let eliminate = event.querySelector(".trash-button");
+    eliminate.addEventListener("click", function(){
+        eliminate.parentNode.remove();
+        saveListToLocalStorage();
+    });
+
+
+    let checkbox = event.querySelector(".checkbox-eliminate");
+    
+    checkbox.addEventListener('click', function(e){
+        e.stopPropagation();
+        checkbox.checked = !checkbox.checked;
+        if(checkbox.checked){
+            event.style.border = "5px solid red";
         } else {
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = true;
-                checkbox.parentNode.parentNode.style.border = "5px solid red";
-            });
+            event.style.border = "5px solid black";
         }
+        saveListToLocalStorage();
+    });
+
+    event.addEventListener('click', function(e){
+        if (!e.target.classList.contains('details') && 
+            !e.target.classList.contains('details-edit') &&
+            !e.target.classList.contains('day') &&
+            !e.target.classList.contains('time')) {
+            checkbox.checked = !checkbox.checked;
+            if(checkbox.checked){
+                event.style.border = "5px solid red";
+            } else {
+                event.style.border = "5px solid black";
+            }
+            saveListToLocalStorage();
+        }
+    });
+
+
+    function addEditability(element, inputType = 'text') {
+        element.addEventListener('dblclick', function editHandler(e) {
+            e.stopPropagation(); 
+            
+
+            let input = document.createElement('input');
+            input.type = inputType;
+            input.className = 'details-edit';
+            
+
+            if (element.classList.contains('day') || element.classList.contains('time')) {
+                input.style.width = '100px';
+            }
+
+            if (inputType === 'date') {
+
+                input.value = element.textContent.trim();
+            } else if (inputType === 'time') {
+
+                input.value = element.textContent.trim();
+            } else {
+                input.value = element.textContent.trim();
+            }
+
+            element.parentNode.replaceChild(input, element);
+            input.focus();
+            
+            function handleEdit() {
+                let value = input.value.trim();
+                if (value) {
+                    let newElement = document.createElement('div');
+                    newElement.className = element.className;
+                    
+                    if (inputType === 'date') {
+
+                        newElement.textContent = value;
+                    } else if (inputType === 'time') {
+
+                        newElement.textContent = value;
+                    } else {
+                        newElement.textContent = value;
+                    }
+                    
+                    addEditability(newElement, inputType);
+                    
+                    input.parentNode.replaceChild(newElement, input);
+                    saveListToLocalStorage();
+                }
+            }
+            
+            input.addEventListener('blur', handleEdit);
+            input.addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    handleEdit();
+                }
+                if (e.key === 'Escape') {
+                    input.value = element.textContent.trim();
+                    input.blur();
+                }
+            });
+        });
+    }
+
+    addEditability(event.querySelector(".details"), 'text');
+    addEditability(event.querySelector(".day"), 'date');
+    addEditability(event.querySelector(".time"), 'time');
+
+    if (checkbox.checked) {
+        event.style.border = "5px solid red";
+    }
+
+    return event;
+}
+
+function isInputField(element) {
+    return element.tagName === 'INPUT' || 
+           element.tagName === 'TEXTAREA' || 
+           element.contentEditable === 'true';
+}
+
+function toggleItemBorder(checkbox, selected) {
+    const parentContainer = checkbox.parentNode.parentNode;
+    checkbox.checked = selected;
+    parentContainer.style.border = selected ? "5px solid red" : "5px solid black";
+}
+
+
+function handleBulkSelection(checkboxes) {
+    const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+    checkboxes.forEach(checkbox => toggleItemBorder(checkbox, !allChecked));
+    saveListToLocalStorage();
+}
+
+
+document.addEventListener("keydown", function(event) {
+    try {
+
+        if (isInputField(document.activeElement)) {
+            return;
+        }
+
+        if (event.key === "Backspace" || event.key === "Delete") {
+            const removeButton = document.getElementById("remove-checked");
+            if (removeButton) {
+                removeButton.click();
+            } else {
+                console.warn("Remove button not found");
+            }
+        }
+
+        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "a") {
+            event.preventDefault();
+            
+            const checkboxes = document.querySelectorAll(".checkbox-eliminate");
+            if (checkboxes.length > 0) {
+                handleBulkSelection(checkboxes);
+            } else {
+                console.warn("No checkboxes found with class 'checkbox-eliminate'");
+            }
+        }
+    } catch (error) {
+        console.error("Error in keyboard event handler:", error);
     }
 });
 
@@ -36,68 +194,31 @@ if (document.getElementById("insert-button") && document.getElementById("input-b
             document.getElementById("insert-button").click();
         }
     });
+
     document.getElementById("insert-button").addEventListener('click', function () {
         let inputText = document.getElementById("input-box").value;
         let dateInput = document.getElementById("date-box").value;
+        let timeInput = document.getElementById("time-box").value;
+        document.getElementById("input-box").value = "";
+        
         if(!inputText.trim()){
             return;
         }
+        
         if (!dateInput.trim()) {
             let currentDate = new Date();
-            let formattedDate = currentDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
-            dateInput = formattedDate;
+            dateInput = currentDate.toISOString().split('T')[0];
+        }
+        
+        if (!timeInput.trim()) {
+            let currentTime = new Date();
+            timeInput = currentTime.toTimeString().split(' ')[0].slice(0, 5);
         }
 
-        let event = document.createElement("div");
-        event.className = "event";
-        event.id = "event";
-
-        event.innerHTML = `
-            <div class="check">
-                <input type="checkbox" class="checkbox-eliminate">
-            </div>
-            <button class="trash-button"><i class="fa fa-trash"></i></button>
-            <div class="details">
-                ${inputText}
-            </div>
-            <div class="day">
-                ${dateInput}
-            </div>
-        `;
-
-        let eliminate = event.querySelector(".trash-button");
-        eliminate.addEventListener("click", function(){
-            eliminate.parentNode.remove();
-            saveListToLocalStorage();
-        });
-
-        let checkbox = event.querySelector(".checkbox-eliminate");
-
-        checkbox.addEventListener('click', function(){
-            checkbox.checked = !checkbox.checked;
-            if(checkbox.checked){
-                event.style.border = "5px solid red";
-            }
-            else{
-                event.style.border = "5px solid black";
-            }
-        });
-
-        event.addEventListener('click', function(){
-            checkbox.checked = !checkbox.checked;
-            if(checkbox.checked){
-                event.style.border = "5px solid red";
-            }
-            else{
-                event.style.border = "5px solid black";
-            }
-        });
-
+        let event = createEvent(inputText, dateInput, timeInput);
         list.appendChild(event);
         saveListToLocalStorage();
     });
-} else {
-    console.error("Elements 'insert-button' or 'input-box' not found.");
 }
 
 document.getElementById("eliminate-all").onclick = function (){
@@ -118,10 +239,6 @@ document.getElementById("remove-checked").onclick = function(){
     saveListToLocalStorage();
 }
 
-document.getElementById("information-button").onclick = function(){
-    alert(`Hi! This is your own to do list app, here's how you can use it.\n\nEvent insertion:\nTo insert you write the details about the event you want to plan (if you don't insert any details, you will not be able to insert any event), then you can add a date to your plan, if you don't, it'll automatically set the date to the day you inserted it on.\n\nTo add an event to the list, you can click the "Add event" button, or click "Enter" while in the input or date feild.\n\nList use:\nTo check events that you already completed, either click on the checkbox or the event itself.\n\nTo eliminate the events you checked you can either click the "Remove checked events" buttons or simply press the "Backspace" or "delete" key.\n\nTo check all the elements simply press "Ctrl+A".\n\nTo clear the list click the "Clear list" button.\n\n`);
-}
-
 document.addEventListener("DOMContentLoaded", function (){
     loadListFromLocalStorage();
 });
@@ -132,6 +249,7 @@ function saveListToLocalStorage() {
         events.push({
             text: event.querySelector(".details").innerText,
             date: event.querySelector(".day").innerText,
+            time: event.querySelector(".time").innerText,
             checked: event.querySelector(".checkbox-eliminate").checked
         });
     });
@@ -142,59 +260,7 @@ function loadListFromLocalStorage() {
     let storedEvents = localStorage.getItem("list");
     if (storedEvents) {
         JSON.parse(storedEvents).forEach(eventData => {
-            let event = document.createElement("div");
-            event.className = "event";
-            event.id = "event";
-            
-            event.innerHTML = `
-                <div class="check">
-                    <input type="checkbox" class="checkbox-eliminate" ${eventData.checked ? 'checked' : ''}>
-                </div>
-                <button class="trash-button"><i class="fa fa-trash"></i></button>
-                <div class="details">
-                    ${eventData.text}
-                </div>
-                <div class="day">
-                    ${eventData.date}
-                </div>
-            `;
-
-            let eliminate = event.querySelector(".trash-button");
-            eliminate.addEventListener("click", function(){
-                eliminate.parentNode.remove();
-                saveListToLocalStorage();
-            });
-
-            let checkbox = event.querySelector(".checkbox-eliminate");
-
-            checkbox.addEventListener('click', function(){
-                checkbox.checked = !checkbox.checked;
-                if(checkbox.checked){
-                    event.style.border = "5px solid red";
-                }
-                else{
-                    event.style.border = "5px solid black";
-                }
-                saveListToLocalStorage();
-            });
-
-            event.addEventListener('click', function(){
-                checkbox.checked = !checkbox.checked;
-                if(checkbox.checked){
-                    event.style.border = "5px solid red";
-                }
-                else{
-                    event.style.border = "5px solid black";
-                }
-                saveListToLocalStorage();
-            });
-
-            if (checkbox.checked) {
-                event.style.border = "5px solid red";
-            } else {
-                event.style.border = "5px solid black";
-            }
-
+            let event = createEvent(eventData.text, eventData.date, eventData.time, eventData.checked);
             list.appendChild(event);
         });
     }
